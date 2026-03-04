@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
+import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate, spring, Img } from 'remotion';
 
 export type Question = {
   id: string;
@@ -17,11 +17,11 @@ export type EduClipVideoProps = {
 
 const ChannelBadge: React.FC = () => {
   return (
-    <div className="absolute top-12 left-12 flex items-center gap-4 bg-zinc-900/80 backdrop-blur-md px-6 py-3 rounded-full border border-zinc-800 shadow-xl z-50">
-      <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+    <div className="absolute top-16 left-12 flex items-center gap-6 bg-slate-900/80 backdrop-blur-md px-8 py-4 rounded-full border-2 border-slate-700 shadow-2xl z-50">
+      <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-slate-900 font-black text-3xl">
         EC
       </div>
-      <span className="text-white font-bold text-2xl tracking-tight">EduClip AI</span>
+      <span className="text-white font-bold text-4xl tracking-tight">EduClip AI</span>
     </div>
   );
 };
@@ -40,21 +40,182 @@ const SubscribeReminder: React.FC = () => {
 
   return (
     <div 
-      className="absolute top-12 right-12 flex flex-col gap-4 z-50"
+      className="absolute top-16 right-12 flex flex-col gap-6 z-50"
       style={{ 
         transform: `translateY(${interpolate(translateY, [0, 1], [-100, 0])}px)`,
         opacity
       }}
     >
-      <div className="bg-red-600 text-white px-6 py-3 rounded-full font-bold text-xl shadow-lg flex items-center gap-3">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M21.593 7.203a2.506 2.506 0 0 0-1.762-1.766C18.265 5.007 12 5 12 5s-6.264-.007-7.831.43a2.506 2.506 0 0 0-1.762 1.766C2.007 8.771 2 12 2 12s.007 3.229.407 4.797a2.506 2.506 0 0 0 1.762 1.766C5.736 18.993 12 19 12 19s6.265.007 7.831-.43a2.506 2.506 0 0 0 1.762-1.766C21.993 15.229 22 12 22 12s-.007-3.229-.407-4.797zM9.5 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+      <div className="bg-red-600 text-white px-8 py-4 rounded-full font-bold text-3xl shadow-2xl flex items-center gap-4">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M21.593 7.203a2.506 2.506 0 0 0-1.762-1.766C18.265 5.007 12 5 12 5s-6.264-.007-7.831.43a2.506 2.506 0 0 0-1.762 1.766C2.007 8.771 2 12 2 12s.007 3.229.407 4.797a2.506 2.506 0 0 0 1.762 1.766C5.736 18.993 12 19 12 19s6.265.007 7.831-.43a2.506 2.506 0 0 0 1.762-1.766C21.993 15.229 22 12 22 12s-.007-3.229-.407-4.797zM9.5 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
         Subscribe
       </div>
-      <div className="bg-blue-600 text-white px-6 py-3 rounded-full font-bold text-xl shadow-lg flex items-center gap-3">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+      <div className="bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-3xl shadow-2xl flex items-center gap-4">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
         Like
       </div>
     </div>
+  );
+};
+
+const CircularCountdown: React.FC<{ progress: number, countdown: number }> = ({ progress, countdown }) => {
+  const radius = 100;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center mb-16 z-10">
+      <svg width="240" height="240" className="transform -rotate-90">
+        <circle
+          cx="120"
+          cy="120"
+          r={radius}
+          stroke="rgba(255,255,255,0.1)"
+          strokeWidth="16"
+          fill="none"
+        />
+        <circle
+          cx="120"
+          cy="120"
+          r={radius}
+          stroke="#f59e0b" // amber-500
+          strokeWidth="16"
+          fill="none"
+          strokeLinecap="round"
+          style={{
+            strokeDasharray: circumference,
+            strokeDashoffset: strokeDashoffset,
+          }}
+        />
+      </svg>
+      <div className="absolute text-[6rem] font-black text-white">
+        {countdown}
+      </div>
+    </div>
+  );
+};
+
+const IntroScene: React.FC<{ topic: string }> = ({ topic }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const logoScale = spring({
+    frame,
+    fps,
+    config: { damping: 12 },
+  });
+
+  const titleOpacity = interpolate(frame, [10, 25], [0, 1], { extrapolateRight: 'clamp' });
+  const titleY = interpolate(frame, [10, 25], [50, 0], { extrapolateRight: 'clamp' });
+
+  const topicOpacity = interpolate(frame, [25, 40], [0, 1], { extrapolateRight: 'clamp' });
+  const topicScale = spring({
+    frame: frame - 25,
+    fps,
+    config: { damping: 12 },
+  });
+
+  const readyOpacity = interpolate(frame, [50, 65], [0, 1], { extrapolateRight: 'clamp' });
+
+  return (
+    <AbsoluteFill className="bg-slate-950 text-white flex flex-col items-center justify-center font-sans overflow-hidden">
+      <AbsoluteFill>
+        <Img 
+          src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1080&auto=format&fit=crop" 
+          className="w-full h-full object-cover opacity-40"
+          style={{ filter: 'blur(8px)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950/90" />
+      </AbsoluteFill>
+
+      <div className="relative z-10 flex flex-col items-center justify-center p-12 text-center w-full">
+        <div 
+          style={{ transform: `scale(${logoScale})` }}
+          className="w-64 h-64 bg-amber-500 rounded-full flex items-center justify-center text-slate-900 font-black text-[6rem] mb-16 shadow-[0_0_80px_rgba(245,158,11,0.6)]"
+        >
+          EC
+        </div>
+        
+        <div className="flex flex-col items-center justify-center w-full">
+          <h1 
+            style={{ opacity: titleOpacity, transform: `translateY(${titleY}px)` }}
+            className="text-[7rem] font-black mb-10 tracking-tight drop-shadow-2xl leading-tight"
+          >
+            Test Your English!
+          </h1>
+          
+          <div 
+            style={{ opacity: topicOpacity, transform: `scale(${topicScale})` }}
+            className="bg-slate-800/90 backdrop-blur-md border-4 border-slate-600 px-12 py-6 rounded-full inline-block shadow-2xl mb-16 max-w-[90%]"
+          >
+            <h2 className="text-[4rem] font-bold text-amber-400 uppercase tracking-widest truncate">
+              {topic || "General Knowledge"}
+            </h2>
+          </div>
+          
+          <p 
+            style={{ opacity: readyOpacity }}
+            className="text-[3.5rem] font-medium text-slate-300 animate-pulse"
+          >
+            Are you ready? Let's go! 🚀
+          </p>
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const OutroScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const textScale = spring({
+    frame,
+    fps,
+    config: { damping: 12 },
+  });
+
+  const iconsOpacity = interpolate(frame, [30, 45], [0, 1], { extrapolateRight: 'clamp' });
+  const iconsY = interpolate(frame, [30, 45], [50, 0], { extrapolateRight: 'clamp' });
+
+  return (
+    <AbsoluteFill className="bg-slate-950 text-white flex flex-col items-center justify-center font-sans overflow-hidden">
+      <AbsoluteFill>
+        <Img 
+          src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1080&auto=format&fit=crop" 
+          className="w-full h-full object-cover opacity-40"
+          style={{ filter: 'blur(8px)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950/90" />
+      </AbsoluteFill>
+
+      <div className="relative z-10 flex flex-col items-center justify-center p-12 text-center w-full">
+        <div style={{ transform: `scale(${textScale})` }} className="mb-24">
+          <h1 className="text-[8rem] font-black text-amber-500 mb-8 drop-shadow-2xl leading-tight">How was<br/>your score?</h1>
+          <h2 className="text-[5rem] font-bold text-white drop-shadow-xl">Did you get 100%? 💯</h2>
+        </div>
+
+        <div 
+          style={{ opacity: iconsOpacity, transform: `translateY(${iconsY}px)` }}
+          className="flex flex-col items-center gap-12 w-full max-w-3xl"
+        >
+          <div className="bg-slate-800/90 backdrop-blur-md border-4 border-slate-600 p-10 rounded-[3rem] w-full shadow-2xl">
+            <p className="text-[3.5rem] font-bold text-white mb-2">Let us know in the comments! 👇</p>
+          </div>
+          
+          <div className="flex gap-8 w-full">
+            <div className="flex-1 bg-blue-600 p-10 rounded-[3rem] flex flex-col items-center justify-center gap-6 shadow-2xl">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+              <span className="text-[3rem] font-bold">Like</span>
+            </div>
+            <div className="flex-1 bg-red-600 p-10 rounded-[3rem] flex flex-col items-center justify-center gap-6 shadow-2xl">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M21.593 7.203a2.506 2.506 0 0 0-1.762-1.766C18.265 5.007 12 5 12 5s-6.264-.007-7.831.43a2.506 2.506 0 0 0-1.762 1.766C2.007 8.771 2 12 2 12s.007 3.229.407 4.797a2.506 2.506 0 0 0 1.762 1.766C5.736 18.993 12 19 12 19s6.265.007 7.831-.43a2.506 2.506 0 0 0 1.762-1.766C21.993 15.229 22 12 22 12s-.007-3.229-.407-4.797zM9.5 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+              <span className="text-[3rem] font-bold">Subscribe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AbsoluteFill>
   );
 };
 
@@ -92,84 +253,88 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
   ].sort((a, b) => a.text.localeCompare(b.text)); // Simple deterministic shuffle based on text
 
   return (
-    <AbsoluteFill className="bg-zinc-950 text-white p-12 flex flex-col items-center justify-center font-sans">
-      <ChannelBadge />
-      {index === 0 && <SubscribeReminder />}
+    <AbsoluteFill className="bg-slate-950 text-white flex flex-col items-center justify-center font-sans overflow-hidden">
+      {/* Background Image with Overlay */}
+      <AbsoluteFill>
+        <Img 
+          src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1080&auto=format&fit=crop" 
+          className="w-full h-full object-cover opacity-40"
+          style={{ filter: 'blur(8px)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950/90" />
+      </AbsoluteFill>
 
-      <div className="absolute top-32 left-12 right-12 flex justify-center items-center text-zinc-400 text-2xl font-bold">
-        <span>Question {index + 1}/{total}</span>
-      </div>
+      <div className="relative z-10 w-full h-full p-12 flex flex-col items-center justify-center">
+        <ChannelBadge />
+        {index === 0 && <SubscribeReminder />}
 
-      {showCountdown && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center opacity-10 pointer-events-none z-0">
-          <div className="text-[24rem] font-black text-indigo-500 leading-none">
-            {countdown}
-          </div>
+        <div className="absolute top-40 left-12 right-12 flex justify-center items-center text-amber-500 text-[2.5rem] font-bold tracking-widest uppercase">
+          <span>Question {index + 1} of {total}</span>
         </div>
-      )}
 
-      <div 
-        style={{ opacity: titleOpacity, transform: `translateY(${titleY}px)` }}
-        className="text-6xl font-bold text-center mb-16 leading-tight z-10"
-      >
-        {question.question}
-      </div>
-
-      {showCountdown && (
-        <div className="w-full max-w-2xl h-4 bg-zinc-800 rounded-full mb-8 overflow-hidden z-10">
-          <div 
-            className="h-full bg-indigo-500 rounded-full"
-            style={{ width: `${timerProgress}%` }}
-          />
-        </div>
-      )}
-
-      <div 
-        style={{ opacity: optionsOpacity }}
-        className="w-full max-w-2xl flex flex-col gap-6 z-10"
-      >
-        {options.map((opt, i) => {
-          const isSelected = isRevealed && opt.isCorrect;
-          const isWrong = isRevealed && !opt.isCorrect;
-          
-          let bgColor = 'bg-zinc-800';
-          let borderColor = 'border-zinc-700';
-          
-          if (isRevealed) {
-            if (opt.isCorrect) {
-              bgColor = 'bg-emerald-600';
-              borderColor = 'border-emerald-500';
-            } else {
-              bgColor = 'bg-red-900/50';
-              borderColor = 'border-red-900';
-            }
-          }
-
-          return (
-            <div 
-              key={i}
-              className={`p-8 rounded-2xl border-4 text-4xl font-semibold transition-colors duration-500 ${bgColor} ${borderColor}`}
-            >
-              {opt.text}
-            </div>
-          );
-        })}
-      </div>
-
-      {isRevealed && (
         <div 
-          style={{ opacity: interpolate(frame, [revealFrame, revealFrame + 15], [0, 1], { extrapolateRight: 'clamp' }) }}
-          className="absolute bottom-24 left-12 right-12 bg-indigo-600 p-8 rounded-2xl text-3xl text-center shadow-2xl z-20"
+          style={{ opacity: titleOpacity, transform: `translateY(${titleY}px)` }}
+          className="text-[5rem] font-bold text-center mb-16 leading-tight z-10 drop-shadow-2xl px-8"
         >
-          <span className="font-bold block mb-2">Explanation:</span>
-          {question.explanation}
+          {question.question}
         </div>
-      )}
+
+        {showCountdown ? (
+          <CircularCountdown progress={timerProgress} countdown={countdown} />
+        ) : (
+          <div className="h-[240px] mb-16" /> // Spacer to keep layout stable
+        )}
+
+        <div 
+          style={{ opacity: optionsOpacity }}
+          className="w-full max-w-3xl flex flex-col gap-8 z-10"
+        >
+          {options.map((opt, i) => {
+            const isSelected = isRevealed && opt.isCorrect;
+            const isWrong = isRevealed && !opt.isCorrect;
+            
+            let bgColor = 'bg-slate-800/80 backdrop-blur-sm';
+            let borderColor = 'border-slate-600';
+            let textColor = 'text-white';
+            
+            if (isRevealed) {
+              if (opt.isCorrect) {
+                bgColor = 'bg-emerald-500';
+                borderColor = 'border-emerald-400';
+                textColor = 'text-slate-950';
+              } else {
+                bgColor = 'bg-red-900/80 backdrop-blur-sm';
+                borderColor = 'border-red-700';
+                textColor = 'text-white/50';
+              }
+            }
+
+            return (
+              <div 
+                key={i}
+                className={`p-10 rounded-[2rem] border-4 text-[3.5rem] font-semibold transition-all duration-500 shadow-2xl ${bgColor} ${borderColor} ${textColor}`}
+              >
+                {opt.text}
+              </div>
+            );
+          })}
+        </div>
+
+        {isRevealed && (
+          <div 
+            style={{ opacity: interpolate(frame, [revealFrame, revealFrame + 15], [0, 1], { extrapolateRight: 'clamp' }) }}
+            className="absolute bottom-32 left-12 right-12 bg-amber-500 p-10 rounded-[2rem] text-[3rem] text-center shadow-2xl z-20 text-slate-950"
+          >
+            <span className="font-black block mb-4 uppercase tracking-wider text-slate-800 text-[2.5rem]">Explanation</span>
+            <span className="font-medium leading-snug">{question.explanation}</span>
+          </div>
+        )}
+      </div>
       
       {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-4 bg-zinc-900 z-50">
+      <div className="absolute bottom-0 left-0 right-0 h-6 bg-slate-900 z-50">
         <div 
-          className="h-full bg-indigo-500"
+          className="h-full bg-amber-500"
           style={{ width: `${((index + (frame / (10 * fps))) / total) * 100}%` }}
         />
       </div>
@@ -179,27 +344,43 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
 
 export const EduClipVideo: React.FC<EduClipVideoProps> = ({ questions, topic }) => {
   const { fps } = useVideoConfig();
+  const introDuration = 4 * fps; // 4 seconds intro
+  const outroDuration = 5 * fps; // 5 seconds outro
   const durationPerQuestion = 10 * fps; // 10 seconds per question
 
   if (!questions || questions.length === 0) {
     return (
-      <AbsoluteFill className="bg-zinc-950 text-white flex items-center justify-center text-4xl font-bold">
+      <AbsoluteFill className="bg-slate-950 text-white flex items-center justify-center text-4xl font-bold">
         No questions available
       </AbsoluteFill>
     );
   }
 
   return (
-    <AbsoluteFill className="bg-zinc-950">
+    <AbsoluteFill className="bg-slate-950">
+      {/* Intro Sequence */}
+      <Sequence from={0} durationInFrames={introDuration}>
+        <IntroScene topic={topic} />
+      </Sequence>
+
+      {/* Questions Sequences */}
       {questions.map((q, index) => (
         <Sequence
           key={q.id}
-          from={index * durationPerQuestion}
+          from={introDuration + (index * durationPerQuestion)}
           durationInFrames={durationPerQuestion}
         >
           <QuestionScene question={q} index={index} total={questions.length} />
         </Sequence>
       ))}
+
+      {/* Outro Sequence */}
+      <Sequence 
+        from={introDuration + (questions.length * durationPerQuestion)} 
+        durationInFrames={outroDuration}
+      >
+        <OutroScene />
+      </Sequence>
     </AbsoluteFill>
   );
 };

@@ -150,7 +150,7 @@ export default function Dashboard() {
                 <Player
                   component={EduClipVideo}
                   inputProps={{ questions, topic }}
-                  durationInFrames={questions.length * 300} // 10s per question at 30fps
+                  durationInFrames={(4 * 30) + (questions.length * 300) + (5 * 30)} // Intro + Questions + Outro
                   compositionWidth={1080}
                   compositionHeight={1920}
                   fps={30}
