@@ -26,7 +26,7 @@ export default function Dashboard() {
     mutationFn: async (topicInput: string) => {
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `Generate 5 multiple-choice questions about English grammar or vocabulary focusing on: ${topicInput}. Each question should have 1 correct answer and 2 common distractors (mistakes learners often make). Provide a brief explanation of why the correct answer is right.`,
+        contents: `Generate 5 multiple-choice questions about English grammar or vocabulary focusing on: ${topicInput}. The question MUST contain '___' (three underscores) where the missing word should be. Each question should have 1 correct answer and 2 common distractors (mistakes learners often make). Provide a brief explanation of why the correct answer is right.`,
         config: {
           responseMimeType: 'application/json',
           responseSchema: {

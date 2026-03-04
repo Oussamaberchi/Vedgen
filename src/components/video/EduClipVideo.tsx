@@ -99,20 +99,12 @@ const IntroScene: React.FC<{ topic: string }> = ({ topic }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const logoScale = spring({
-    frame,
-    fps,
-    config: { damping: 12 },
-  });
+  const words = "Test Your English!".split(" ");
 
-  const titleOpacity = interpolate(frame, [10, 25], [0, 1], { extrapolateRight: 'clamp' });
-  const titleY = interpolate(frame, [10, 25], [50, 0], { extrapolateRight: 'clamp' });
-
-  const topicOpacity = interpolate(frame, [25, 40], [0, 1], { extrapolateRight: 'clamp' });
   const topicScale = spring({
     frame: frame - 25,
     fps,
-    config: { damping: 12 },
+    config: { mass: 1.5, damping: 12, stiffness: 100 },
   });
 
   const readyOpacity = interpolate(frame, [50, 65], [0, 1], { extrapolateRight: 'clamp' });
@@ -125,41 +117,40 @@ const IntroScene: React.FC<{ topic: string }> = ({ topic }) => {
           className="w-full h-full object-cover opacity-40"
           style={{ filter: 'blur(8px)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-900/80 to-slate-950/95" />
       </AbsoluteFill>
 
       <div className="relative z-10 flex flex-col items-center justify-center p-12 text-center w-full">
-        <div 
-          style={{ transform: `scale(${logoScale})` }}
-          className="w-64 h-64 bg-amber-500 rounded-full flex items-center justify-center text-slate-900 font-black text-[6rem] mb-16 shadow-[0_0_80px_rgba(245,158,11,0.6)]"
-        >
-          EC
+        <div className="flex flex-wrap justify-center gap-6 mb-16">
+          {words.map((word, i) => {
+            const wordScale = spring({
+              frame: frame - (i * 5),
+              fps,
+              config: { damping: 12 }
+            });
+            return (
+              <span key={i} style={{ transform: `scale(${wordScale})`, display: 'inline-block' }} className="text-[8rem] font-black tracking-tight drop-shadow-2xl leading-tight text-white">
+                {word}
+              </span>
+            )
+          })}
         </div>
         
-        <div className="flex flex-col items-center justify-center w-full">
-          <h1 
-            style={{ opacity: titleOpacity, transform: `translateY(${titleY}px)` }}
-            className="text-[7rem] font-black mb-10 tracking-tight drop-shadow-2xl leading-tight"
-          >
-            Test Your English!
-          </h1>
-          
-          <div 
-            style={{ opacity: topicOpacity, transform: `scale(${topicScale})` }}
-            className="bg-slate-800/90 backdrop-blur-md border-4 border-slate-600 px-12 py-6 rounded-full inline-block shadow-2xl mb-16 max-w-[90%]"
-          >
-            <h2 className="text-[4rem] font-bold text-amber-400 uppercase tracking-widest truncate">
-              {topic || "General Knowledge"}
-            </h2>
-          </div>
-          
-          <p 
-            style={{ opacity: readyOpacity }}
-            className="text-[3.5rem] font-medium text-slate-300 animate-pulse"
-          >
-            Are you ready? Let's go! 🚀
-          </p>
+        <div 
+          style={{ transform: `scale(${topicScale})` }}
+          className="bg-amber-500 px-16 py-8 rounded-full shadow-[0_0_80px_rgba(245,158,11,0.4)] mb-20 max-w-[90%]"
+        >
+          <h2 className="text-[4.5rem] font-black text-slate-950 uppercase tracking-widest truncate">
+            {topic || "General Knowledge"}
+          </h2>
         </div>
+        
+        <p 
+          style={{ opacity: readyOpacity }}
+          className="text-[4rem] font-bold text-slate-300 animate-pulse"
+        >
+          Are you ready? Let's go! 🚀
+        </p>
       </div>
     </AbsoluteFill>
   );
@@ -223,10 +214,8 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   
-  // Scene duration: 10 seconds total
-  // 0-1s: Intro question
-  // 1-6s: Countdown & options
-  // 6-10s: Reveal answer & explanation
+  const parts = question.question.split('___');
+  const hasBlank = parts.length > 1;
 
   const titleOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
   const titleY = interpolate(frame, [0, 15], [50, 0], { extrapolateRight: 'clamp' });
@@ -234,6 +223,8 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
   const optionsOpacity = interpolate(frame, [15, 30], [0, 1], { extrapolateRight: 'clamp' });
   
   const revealFrame = 6 * fps;
+  const moveFrame = revealFrame + 15; // 0.5s after reveal, start moving
+
   const isRevealed = frame >= revealFrame;
 
   const countdown = Math.max(0, 5 - Math.floor((frame - 1 * fps) / fps));
@@ -245,6 +236,15 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
     [100, 0],
     { extrapolateRight: 'clamp', extrapolateLeft: 'clamp' }
   );
+
+  const wrongOpacity = interpolate(frame, [revealFrame, revealFrame + 10], [1, 0], { extrapolateRight: 'clamp' });
+  const correctOptionOpacity = interpolate(frame, [moveFrame, moveFrame + 10], [1, 0], { extrapolateRight: 'clamp' });
+  
+  const blankFillOpacity = interpolate(frame, [moveFrame, moveFrame + 10], [0, 1], { extrapolateRight: 'clamp' });
+  const blankFillScale = spring({ frame: frame - moveFrame, fps, config: { damping: 12 } });
+
+  const explanationOpacity = interpolate(frame, [moveFrame + 10, moveFrame + 25], [0, 1], { extrapolateRight: 'clamp' });
+  const explanationY = interpolate(frame, [moveFrame + 10, moveFrame + 25], [50, 0], { extrapolateRight: 'clamp' });
 
   const options = [
     { text: question.correctAnswer, isCorrect: true },
@@ -274,9 +274,28 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
 
         <div 
           style={{ opacity: titleOpacity, transform: `translateY(${titleY}px)` }}
-          className="text-[5rem] font-bold text-center mb-16 leading-tight z-10 drop-shadow-2xl px-8"
+          className="text-[4.5rem] font-bold text-center mb-16 leading-tight z-10 drop-shadow-2xl px-8"
         >
-          {question.question}
+          {hasBlank ? (
+            <>
+              {parts[0]}
+              <span className="inline-block relative mx-4 text-slate-400">
+                <span style={{ opacity: 1 - blankFillOpacity }}>___</span>
+                <span 
+                  className="absolute left-1/2 top-1/2 text-emerald-400 whitespace-nowrap font-black"
+                  style={{ 
+                    opacity: blankFillOpacity, 
+                    transform: `translate(-50%, -50%) scale(${blankFillScale})` 
+                  }}
+                >
+                  {question.correctAnswer}
+                </span>
+              </span>
+              {parts[1]}
+            </>
+          ) : (
+            question.question
+          )}
         </div>
 
         {showCountdown ? (
@@ -290,29 +309,33 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
           className="w-full max-w-3xl flex flex-col gap-8 z-10"
         >
           {options.map((opt, i) => {
-            const isSelected = isRevealed && opt.isCorrect;
-            const isWrong = isRevealed && !opt.isCorrect;
+            const isCorrect = opt.isCorrect;
+            const isRevealedNow = frame >= revealFrame;
             
             let bgColor = 'bg-slate-800/80 backdrop-blur-sm';
             let borderColor = 'border-slate-600';
             let textColor = 'text-white';
+            let itemOpacity = 1;
             
-            if (isRevealed) {
-              if (opt.isCorrect) {
+            if (isRevealedNow) {
+              if (isCorrect) {
                 bgColor = 'bg-emerald-500';
                 borderColor = 'border-emerald-400';
                 textColor = 'text-slate-950';
+                itemOpacity = hasBlank ? correctOptionOpacity : 1;
               } else {
                 bgColor = 'bg-red-900/80 backdrop-blur-sm';
                 borderColor = 'border-red-700';
                 textColor = 'text-white/50';
+                itemOpacity = wrongOpacity;
               }
             }
 
             return (
               <div 
                 key={i}
-                className={`p-10 rounded-[2rem] border-4 text-[3.5rem] font-semibold transition-all duration-500 shadow-2xl ${bgColor} ${borderColor} ${textColor}`}
+                style={{ opacity: itemOpacity }}
+                className={`p-10 rounded-[2rem] border-4 text-[3.5rem] font-semibold transition-colors duration-300 shadow-2xl ${bgColor} ${borderColor} ${textColor}`}
               >
                 {opt.text}
               </div>
@@ -320,9 +343,9 @@ const QuestionScene: React.FC<{ question: Question; index: number; total: number
           })}
         </div>
 
-        {isRevealed && (
+        {frame >= moveFrame && (
           <div 
-            style={{ opacity: interpolate(frame, [revealFrame, revealFrame + 15], [0, 1], { extrapolateRight: 'clamp' }) }}
+            style={{ opacity: explanationOpacity, transform: `translateY(${explanationY}px)` }}
             className="absolute bottom-32 left-12 right-12 bg-amber-500 p-10 rounded-[2rem] text-[3rem] text-center shadow-2xl z-20 text-slate-950"
           >
             <span className="font-black block mb-4 uppercase tracking-wider text-slate-800 text-[2.5rem]">Explanation</span>
